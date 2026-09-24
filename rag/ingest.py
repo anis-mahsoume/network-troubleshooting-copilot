@@ -40,7 +40,8 @@ def load_existing_chunks(output_file):
     return existing_chunks, processed_files
 
 
-def process_folder(pdf_folder, existing_chunks, processed_files):
+def process_folder(pdf_folder="data/raw", chunks_path="data/processed/chunks.json"):
+    existing_chunks, processed_files = load_existing_chunks(chunks_path)
     all_chunks = list(existing_chunks)  # start with what we already have
     chunk_counter = len(all_chunks)      # continue numbering from where we left off
 
@@ -83,17 +84,28 @@ def process_folder(pdf_folder, existing_chunks, processed_files):
             })
             chunk_counter += 1
 
+    with open(chunks_path, "w", encoding="utf-8") as f:
+        json.dump(all_chunks, f, indent=2, ensure_ascii=False)
+
     return all_chunks
 
+def get_ingestion_status(pdf_folder="data/raw", chunks_path="data/processed/chunks.json"):
+    existing_chunks, processed_files = load_existing_chunks(chunks_path)
+
+    all_pdfs = set()
+    for root, _, filenames in os.walk(pdf_folder):
+        for filename in filenames:
+            if filename.lower().endswith(".pdf"):
+                all_pdfs.add(filename)
+
+    pending = sorted(all_pdfs - processed_files)
+    ingested = sorted(processed_files)
+
+    return {"ingested": ingested, "pending": pending}
 
 if __name__ == "__main__":
-    PDF_FOLDER = "./data/raw"
     OUTPUT_FILE = "./data/processed/chunks.json"
 
-    existing_chunks, processed_files = load_existing_chunks(OUTPUT_FILE)
-    chunks = process_folder(PDF_FOLDER, existing_chunks, processed_files)
-
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump(chunks, f, indent=2, ensure_ascii=False)
+    chunks = process_folder(chunks_path=OUTPUT_FILE)
 
     print(f"\nDone. {len(chunks)} total chunks from {len(set(c['source'] for c in chunks))} docs saved to {OUTPUT_FILE}")

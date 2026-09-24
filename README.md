@@ -1,6 +1,6 @@
 # Network Troubleshooting Copilot
 
-A RAG-powered assistant for diagnosing network/IT issues. It retrieves relevant passages from a knowledge base of network troubleshooting documentation (VPN, DNS, DHCP, firewall, routing) and combines them with tool-calling to mocked diagnostic tools (ping, traceroute, DNS lookup, device status, DHCP lease checks).
+A RAG-powered assistant for diagnosing network/IT issues. It retrieves relevant passages from a knowledge base of network troubleshooting documentation (VPN, DNS, DHCP, firewall, routing) and combines them with tool-calling to mocked diagnostic tools (ping, traceroute, DNS lookup, device status, DHCP lease checks). Usable either from the command line or through a Streamlit app.
 
 Built as a hands-on project for RAG, embeddings, and tool/function calling.
 
@@ -18,6 +18,12 @@ agent/
   schemas.py          OpenAI tool/function definitions for the mocked diagnostic tools
   tools.py            mocked implementations of those tools (ping, traceroute, DNS lookup, device status, DHCP lease checks)
   chat_loop.py        retrieval + tool-calling agent loop — the actual copilot
+views/
+  ingest_view.py      Streamlit tab: ingestion status + browse the knowledge base
+  retrieve_view.py    Streamlit tab: test retrieval directly
+  chat_view.py         Streamlit tab: chat with the copilot
+  score_badge.py       shared helper — colored similarity-score label
+app.py                Streamlit app entry point (wires the three tabs above together)
 demo_scenarios.py     a handful of example troubleshooting prompts to run through the agent
 ```
 
@@ -26,7 +32,7 @@ demo_scenarios.py     a handful of example troubleshooting prompts to run throug
 Install dependencies:
 
 ```bash
-python -m pip install pymupdf openai numpy
+python -m pip install pymupdf openai numpy streamlit
 ```
 
 Set your OpenAI API key:
@@ -41,6 +47,20 @@ export OPENAI_API_KEY="sk-..."   # macOS/Linux
 ## Add your troubleshooting documents
 
 Network troubleshooting documents are already included under [data/raw/](data/raw/). You can add your own PDFs there, preferably under a matching subfolder (`vpn/`, `dns/`, `dhcp/`, `firewall/`, `routing/`), or at the root of `data/raw/`.
+
+### Expected PDF format
+
+Ingestion splits each PDF into chunks on a `### ` marker — put one at the start of every distinct symptom/issue section in the document. Everything between one `### ` and the next becomes a single chunk (the marker itself is stripped out), so this is what defines your chunk boundaries:
+
+```
+### Symptom: VPN drops during video calls
+... troubleshooting steps for this symptom ...
+
+### Symptom: VPN authentication fails intermittently
+... troubleshooting steps for this symptom ...
+```
+
+A PDF with no `### ` markers ingests as a single chunk covering the whole document, which hurts retrieval precision and risks exceeding the embedding model's input size on longer files.
 
 ## 1. Ingest: generate the chunks
 
@@ -96,3 +116,15 @@ python -c "from agent.chat_loop import run_conversation; print(run_conversation(
 ```bash
 python demo_scenarios.py
 ```
+
+## 4. Or run the Streamlit app
+
+`app.py` wraps ingestion, retrieval, and chat into one UI with three tabs (`views/ingest_view.py`, `views/retrieve_view.py`, `views/chat_view.py`):
+
+```bash
+streamlit run app.py
+```
+
+- **Ingest tab** — shows which PDFs under `data/raw/` are already ingested vs. pending, lets you run ingestion on pending files from the UI, and lets you browse the resulting chunks.
+- **Retrieve tab** — run ad-hoc queries against the knowledge base and inspect the top-k matches with similarity scores.
+- **Chat tab** — same retrieval + tool-calling flow as `agent/chat_loop.py`, with a scenario picker, and showing retrieved sources and tool calls alongside the final diagnosis.
