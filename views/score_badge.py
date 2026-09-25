@@ -1,8 +1,8 @@
 def score_badge(score):
     """Returns a colored label string for a similarity score."""
-    if score < 0.40:
+    if score < 0.35:
         color = "red"
-    elif score < 0.55:
+    elif score < 0.5:
         color = "orange"
     else:
         color = "green"

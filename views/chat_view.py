@@ -96,11 +96,11 @@ def render(chunks):
                 retrieved, tool_calls_made, answer = None, None, None
 
             if answer:
-                st.subheader("📚 Sources retrieved")
+                st.subheader("Sources retrieved")
                 for r in retrieved:
                     st.markdown(f"{score_badge(r['score'])} `{r['source']}` — *{r['category']}*")
 
-                st.subheader("🔧 Tools called")
+                st.subheader("Tools called")
                 if tool_calls_made:
                     for t in tool_calls_made:
                         st.markdown(f"**{t['name']}**({t['args']})")
@@ -108,7 +108,7 @@ def render(chunks):
                 else:
                     st.write("No tools were called for this query.")
 
-                st.subheader("💡 Diagnosis")
+                st.subheader("Diagnosis")
                 st.markdown(answer)
         else:
             st.warning("Enter a problem description first.")

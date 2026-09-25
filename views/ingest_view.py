@@ -17,12 +17,12 @@ def render(chunks):
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown(f"**✅ Ingested ({len(status['ingested'])})**")
+        st.markdown(f"**Ingested ({len(status['ingested'])})**")
         for f in status["ingested"]:
             st.write(f"- {f}")
 
     with col2:
-        st.markdown(f"**⏳ Pending ({len(status['pending'])})**")
+        st.markdown(f"**Pending ({len(status['pending'])})**")
         for f in status["pending"]:
             st.write(f"- {f}")
 
@@ -45,7 +45,7 @@ def render(chunks):
 
     for source, source_chunks in sorted(by_source.items()):
         category = source_chunks[0]["category"]
-        with st.expander(f"📄 {source} — {category} ({len(source_chunks)} chunks)"):
+        with st.expander(f"{source} — {category} ({len(source_chunks)} chunks)"):
             for c in source_chunks:
                 st.markdown(f"**Chunk {c['chunk_id']}**")
                 st.write(c["text"])

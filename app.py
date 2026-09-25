@@ -25,7 +25,7 @@ if chunks is None:
     )
     st.stop()
 
-tab_ingest, tab_retrieve, tab_chat = st.tabs(["📥 Ingest", "🔍 Retrieve", "💬 Chat"])
+tab_ingest, tab_retrieve, tab_chat = st.tabs(["Ingest", "Retrieve", "Chat"])
 
 with tab_ingest:
     ingest_view.render(chunks)

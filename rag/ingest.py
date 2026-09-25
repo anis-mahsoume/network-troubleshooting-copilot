@@ -58,19 +58,18 @@ def process_folder(pdf_folder="data/raw", chunks_path="data/processed/chunks.jso
         rel_path = os.path.relpath(pdf_path, pdf_folder)
 
         if filename in processed_files:
-            print(f"⏭️  {rel_path}: already processed, skipping")
+            print(f"[SKIP] {rel_path}: already processed")
             continue
 
-        
         category = os.path.dirname(rel_path).replace(os.sep, "/") or "general"
 
         text = extract_text(pdf_path)
 
         word_count = len(text.split())
         if word_count < 200:
-            print(f"⚠️  {rel_path}: only {word_count} words extracted — check this file")
+            print(f"[WARN] {rel_path}: only {word_count} words extracted — check this file")
         else:
-            print(f"✅ {rel_path}: {word_count} words extracted")
+            print(f"[OK]   {rel_path}: {word_count} words extracted")
 
         chunks = chunk_text(text)
         for chunk in chunks:
