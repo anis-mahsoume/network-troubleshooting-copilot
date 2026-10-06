@@ -11,7 +11,7 @@ Built as a hands-on project for RAG, embeddings, and tool/function calling.
 Install dependencies:
 
 ```bash
-python -m pip install pymupdf openai numpy streamlit
+pip install -r requirements.txt
 ```
 
 Set your OpenAI API key:
@@ -135,4 +135,12 @@ python -c "from agent.chat_loop import run_conversation; print(run_conversation(
 
 ```bash
 python demo_scenarios.py
+```
+
+## Tests
+
+Unit tests for the agent loop use a mocked OpenAI client, so no API key or network access is needed:
+
+```bash
+py -m pytest
 ```
